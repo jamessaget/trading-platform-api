@@ -1,0 +1,37 @@
+services:
+  trading-platform-api:
+    container_name: trading-platform-api
+    build:
+      context: .
+      dockerfile: ./docker/Dockerfile
+      args:
+        PORT: ${TRADING_PLATFORM_API_HTTP_PORT:-3000}
+    ports:
+      - ${TRADING_PLATFORM_API_HTTP_PORT:-3000}:${TRADING_PLATFORM_API_HTTP_PORT:-3000}
+    volumes:
+      - ./:/usr/src/app      
+    depends_on:
+      - mysql-trading-platform
+      - redis-trading-platform
+
+  mysql-trading-platform:
+    container_name: mysql-trading-platform
+    image: mysql/mysql-server:8.0.27
+    command: mysqld --sql_mode="" --default-authentication-plugin=mysql_native_password --character-set-server=utf8 --collation-server=utf8_unicode_ci
+    ports:
+      - ${FORWARD_DB_PORT:-3306}:3306
+    environment:
+      MYSQL_ROOT_PASSWORD: ${DB_PASSWORD}
+      MYSQL_DATABASE: ${DB_DATABASE}
+      MYSQL_ROOT_USER: ${DB_USERNAME}
+      MYSQL_USER: ${DB_USERNAME}
+      MYSQL_PASSWORD: ${DB_PASSWORD}
+      MYSQL_ALLOW_EMPTY_PASSWORD: "yes"
+      MYSQL_TCP_PORT: ${DB_PORT}
+      
+  redis-trading-platform:
+    container_name: redis-trading-platform
+    image: redis:4.0
+    restart: unless-stopped
+    ports:
+      - ${FORWARD_REDIS_PORT:-6379}:${REDIS_PORT:-6379}

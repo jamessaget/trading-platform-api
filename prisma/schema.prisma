@@ -1,0 +1,107 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model deal_items {
+  id      Int    @id @default(autoincrement())
+  name    String @db.Text
+  price   Int
+  deal_id Int
+  deals   deals  @relation(fields: [deal_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "deal_items_ibfk_1")
+
+  @@index([deal_id], map: "deal_id")
+}
+
+model deals {
+  id          Int          @id @default(autoincrement())
+  name        String       @db.Text
+  seller_id   Int
+  currency    String       @db.VarChar(20)
+  status      deals_status
+  discount_id Int?
+  total_price Int
+  deal_items  deal_items[]
+  discounts   discounts?   @relation(fields: [discount_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "deals_ibfk_2")
+  user_deals  user_deals[]
+
+  @@index([discount_id], map: "discount_id")
+  @@index([seller_id], map: "seller_id")
+}
+
+model discounts {
+  id     Int            @id @default(autoincrement())
+  type   discounts_type
+  amount Int
+  deals  deals[]
+
+  @@unique([type, amount], map: "discounts_type_amount_unique")
+}
+
+model user_types {
+  id                  Int                   @id @default(autoincrement())
+  type                String                @db.Text
+  created_at          DateTime?             @default(now()) @db.Timestamp(0)
+  updated_at          DateTime?             @default(now()) @db.DateTime(0)
+  users_type_relation users_type_relation[]
+}
+
+model users {
+  id                  Int                   @id @default(autoincrement())
+  password            String                @db.VarChar(255)
+  name                String                @db.Text
+  email               String?               @unique(map: "users_email_unique") @db.VarChar(255)
+  created_at          DateTime?             @default(now()) @db.Timestamp(0)
+  updated_at          DateTime?             @default(now()) @db.DateTime(0)
+  user_deals          user_deals[]
+  users_type_relation users_type_relation[]
+  webhooks            webhooks[]
+}
+
+model users_type_relation {
+  id         Int        @id @default(autoincrement())
+  user_id    Int
+  type_id    Int
+  users      users      @relation(fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "users_type_relation_ibfk_1")
+  user_types user_types @relation(fields: [type_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "users_type_relation_ibfk_2")
+
+  @@index([type_id], map: "type_id")
+  @@index([user_id], map: "user_id")
+}
+
+model user_deals {
+  id      Int   @id @default(autoincrement())
+  deal_id Int
+  user_id Int
+  deals   deals @relation(fields: [deal_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "user_deals_ibfk_1")
+  users   users @relation(fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "user_deals_ibfk_2")
+
+  @@index([deal_id], map: "deal_id")
+  @@index([user_id], map: "user_id")
+}
+
+model webhooks {
+  id            Int    @id @default(autoincrement())
+  webhook_url   String @db.VarChar(255)
+  user_id       Int
+  name          String @db.VarChar(255)
+  client_secret String @db.VarChar(255)
+  users         users  @relation(fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "webhooks_ibfk_1")
+
+  @@unique([webhook_url, name], map: "users_webhook_url_name_unique")
+  @@index([user_id], map: "user_id")
+}
+
+enum discounts_type {
+  percentage
+  flat
+}
+
+enum deals_status {
+  available
+  sold
+}

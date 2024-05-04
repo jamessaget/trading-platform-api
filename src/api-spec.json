@@ -1,0 +1,14 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "trading-platform-api",
+    "version": "1.0",
+    "description": "This API describes the end points of the trading platform api."
+  },
+  "paths": {},
+  "components": {
+    "schemas": {},
+    "requestBodies": {},
+    "responses": {}
+  }
+}
