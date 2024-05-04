@@ -6,12 +6,12 @@
     "test": "tests"
   },
   "scripts": {
-    "start": "nodemon -e ts --exec 'tsc && node ./dist/server.js'",
-    "postinstall": "npm run build",
+    "start": "nodemon -e ts --exec 'npm run build && node ./dist/server.js'",
     "build": "tsc",
     "prebuild": "npm run lint",
     "test": "jest",
-    "lint": "eslint 'src/**/*.ts' --fix"
+    "lint": "eslint 'src/**/*.ts'",
+    "lint-format": "eslint 'src/**/*.ts' --fix"
   },
   "author": "James Saget",
   "license": "ISC",
