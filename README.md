@@ -1,6 +1,6 @@
 # Trading Platform Api
 
-*insert brief description*
+An api to create a user & authentication token which can be used to create and update deals.  Users will only be able to see deals which they have associated to them through the user_deals table. Anytime a new deal is created or an existing deal is updated all users who are authorized to see that sellers deals will get an update sent to any of their registered webhooks.
 
 ## Setup
 
