@@ -16,18 +16,26 @@ export class GetDealsHandler {
     reply: FastifyReply
   ): Promise<FastifyReply> {
     const data = paginatedHttpSchema.parse(request.query);
-    const deals = await this.prismaClient.user_deals.findMany({
+    const subscribedSellers = (await this.prismaClient.user_sellers.findMany({
       skip: (data.page - 1) * data.per_page,
       take: data.per_page,
-      include: {
-        deals: true
-      },
       where: {
         user_id: +request.user_id
       }
+    })).map((seller) => seller.seller_id);
+    const deals = await this.prismaClient.deals.findMany({
+      include: {
+        deal_items: true,
+        discounts: true
+      },
+      where: {
+        seller_id: {
+          in: subscribedSellers
+        }
+      }
     });
     return reply.code(200).send({ 
-      data: deals.map(deal => deal.deals),
+      data: deals,
       meta: {
         page: data.page,
         per_page: data.per_page

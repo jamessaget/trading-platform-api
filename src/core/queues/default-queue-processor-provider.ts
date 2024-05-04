@@ -10,15 +10,15 @@ export const defaultQueueProcessorProvider: (prismaClient?: PrismaClient) => Que
   queue: QueueEnum.DEFAULT_QUEUE,
   processor: async (job: Job, done: DoneCallback) => {
     try {
-      const userDeals = await prismaClient.user_deals.findMany({
+      const subscribers = await prismaClient.user_sellers.findMany({
         where: {
-          deal_id: job.data.data.id
+          seller_id: job.data.data.seller_id
         }
       });
-      for (const userDeal of userDeals) {
+      for (const subscriber of subscribers) {
         const webhooks = await prismaClient.webhooks.findMany({
           where: {
-            user_id: userDeal.user_id
+            user_id: subscriber.user_id
           }
         });
         await Promise.all(webhooks.map(async (webhook) => {

@@ -3,7 +3,7 @@ import { PrismaClient } from '@prisma/client';
 export class PrismaDatabaseClientFactory {
     public static make(overrides: Partial<PrismaClient> = {}): PrismaClient {
         return {
-            user_deals: {
+            user_sellers: {
                 findMany: jest.fn(),
             },
             webhooks:{

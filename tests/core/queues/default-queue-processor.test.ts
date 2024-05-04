@@ -3,10 +3,10 @@ import { defaultQueueProcessorProvider } from "../../../src/core/queues/default-
 import { DealFactory } from "../../factories/deal-factory";
 import { JobFactory } from "../../factories/job-factory";
 import { PrismaDatabaseClientFactory } from "../../factories/prisma-database-client-factory";
-import { UserDealFactory } from "../../factories/user-deal-factory";
 import fetch from "node-fetch";
 import { WebhookFactory } from "../../factories/webhook-factory";
 import crypto from 'crypto'
+import { UserSellerFactory } from "../../factories/user-seller-factory";
 
 jest.mock('node-fetch')
 
@@ -18,7 +18,7 @@ describe('DefaultQueueProcessorProvider', () => {
     it('Will send not retreive webhooks if no users are authorized to see that deal', async () => {
         const doneCallback = jest.fn()
         const prismaClient = PrismaDatabaseClientFactory.make();
-        (prismaClient.user_deals.findMany as jest.Mock).mockResolvedValue([])
+        (prismaClient.user_sellers.findMany as jest.Mock).mockResolvedValue([])
         await defaultQueueProcessorProvider(prismaClient).processor(JobFactory.make({
             data: {
                 event_name: EventsEnum.DEAL_CREATED,
@@ -26,7 +26,7 @@ describe('DefaultQueueProcessorProvider', () => {
                 
             }
         }), doneCallback);
-        expect(prismaClient.user_deals.findMany).toHaveBeenCalledTimes(1)
+        expect(prismaClient.user_sellers.findMany).toHaveBeenCalledTimes(1)
         expect(prismaClient.webhooks.findMany).not.toHaveBeenCalled()
 
     })
@@ -34,9 +34,9 @@ describe('DefaultQueueProcessorProvider', () => {
     it('Will send not send webhooks if none found for that user', async () => {
         const prismaClient = PrismaDatabaseClientFactory.make();
         const doneCallback = jest.fn()
-        const userDeal = UserDealFactory.make();
-        (prismaClient.user_deals.findMany as jest.Mock).mockResolvedValue([
-            userDeal
+        const userSeller = UserSellerFactory.make();
+        (prismaClient.user_sellers.findMany as jest.Mock).mockResolvedValue([
+            userSeller
         ]);
         (prismaClient.webhooks.findMany as jest.Mock).mockResolvedValue([]);
         await defaultQueueProcessorProvider(prismaClient).processor(JobFactory.make({
@@ -46,7 +46,7 @@ describe('DefaultQueueProcessorProvider', () => {
                 
             }
         }), doneCallback);
-        expect(prismaClient.user_deals.findMany).toHaveBeenCalledTimes(1)
+        expect(prismaClient.user_sellers.findMany).toHaveBeenCalledTimes(1)
         expect(prismaClient.webhooks.findMany).toHaveBeenCalledTimes(1)
         expect(fetch).not.toHaveBeenCalled()
     })
@@ -55,7 +55,8 @@ describe('DefaultQueueProcessorProvider', () => {
         const prismaClient = PrismaDatabaseClientFactory.make();
         const doneCallback = jest.fn()
         const deal = DealFactory.make();
-        const userDeal = UserDealFactory.make({deal_id: deal.id});
+        // @todo think
+        const userDeal = UserSellerFactory.make({deal_id: deal.id});
         const webhook = WebhookFactory.make({user_id: userDeal.user_id});
         const job = JobFactory.make({
             data: {
@@ -63,14 +64,14 @@ describe('DefaultQueueProcessorProvider', () => {
                 data: deal
             }
         });
-        (prismaClient.user_deals.findMany as jest.Mock).mockResolvedValue([
+        (prismaClient.user_sellers.findMany as jest.Mock).mockResolvedValue([
             userDeal
         ]);
         (prismaClient.webhooks.findMany as jest.Mock).mockResolvedValue([
             webhook
         ]);
         await defaultQueueProcessorProvider(prismaClient).processor(job, doneCallback);
-        expect(prismaClient.user_deals.findMany).toHaveBeenCalledTimes(1)
+        expect(prismaClient.user_sellers.findMany).toHaveBeenCalledTimes(1)
         expect(prismaClient.webhooks.findMany).toHaveBeenCalledTimes(1)
         expect(fetch).toBeCalledWith(webhook.webhook_url, {
             method: 'POST',

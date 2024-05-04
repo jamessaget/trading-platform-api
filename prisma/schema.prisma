@@ -27,7 +27,6 @@ model deals {
   total_price Int
   deal_items  deal_items[]
   discounts   discounts?   @relation(fields: [discount_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "deals_ibfk_2")
-  user_deals  user_deals[]
 
   @@index([discount_id], map: "discount_id")
   @@index([seller_id], map: "seller_id")
@@ -51,15 +50,16 @@ model user_types {
 }
 
 model users {
-  id                  Int                   @id @default(autoincrement())
-  password            String                @db.VarChar(255)
-  name                String                @db.Text
-  email               String?               @unique(map: "users_email_unique") @db.VarChar(255)
-  created_at          DateTime?             @default(now()) @db.Timestamp(0)
-  updated_at          DateTime?             @default(now()) @db.DateTime(0)
-  user_deals          user_deals[]
-  users_type_relation users_type_relation[]
-  webhooks            webhooks[]
+  id                                         Int                   @id @default(autoincrement())
+  password                                   String                @db.VarChar(255)
+  name                                       String                @db.Text
+  email                                      String?               @unique(map: "users_email_unique") @db.VarChar(255)
+  created_at                                 DateTime?             @default(now()) @db.Timestamp(0)
+  updated_at                                 DateTime?             @default(now()) @db.DateTime(0)
+  user_sellers_user_sellers_user_idTousers   user_sellers[]        @relation("user_sellers_user_idTousers")
+  user_sellers_user_sellers_seller_idTousers user_sellers[]        @relation("user_sellers_seller_idTousers")
+  users_type_relation                        users_type_relation[]
+  webhooks                                   webhooks[]
 }
 
 model users_type_relation {
@@ -73,17 +73,6 @@ model users_type_relation {
   @@index([user_id], map: "user_id")
 }
 
-model user_deals {
-  id      Int   @id @default(autoincrement())
-  deal_id Int
-  user_id Int
-  deals   deals @relation(fields: [deal_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "user_deals_ibfk_1")
-  users   users @relation(fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "user_deals_ibfk_2")
-
-  @@index([deal_id], map: "deal_id")
-  @@index([user_id], map: "user_id")
-}
-
 model webhooks {
   id            Int    @id @default(autoincrement())
   webhook_url   String @db.VarChar(255)
@@ -93,6 +82,17 @@ model webhooks {
   users         users  @relation(fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "webhooks_ibfk_1")
 
   @@unique([webhook_url, name], map: "users_webhook_url_name_unique")
+  @@index([user_id], map: "user_id")
+}
+
+model user_sellers {
+  id                                  Int   @id @default(autoincrement())
+  seller_id                           Int
+  user_id                             Int
+  users_user_sellers_user_idTousers   users @relation("user_sellers_user_idTousers", fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "user_sellers_ibfk_1")
+  users_user_sellers_seller_idTousers users @relation("user_sellers_seller_idTousers", fields: [seller_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "user_sellers_ibfk_2")
+
+  @@index([seller_id], map: "seller_id")
   @@index([user_id], map: "user_id")
 }
 
