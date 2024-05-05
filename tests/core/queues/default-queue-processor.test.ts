@@ -7,6 +7,7 @@ import fetch from "node-fetch";
 import { WebhookFactory } from "../../factories/webhook-factory";
 import crypto from 'crypto'
 import { UserSellerFactory } from "../../factories/user-seller-factory";
+import { UserFactory } from "../../factories/user-factory";
 
 jest.mock('node-fetch')
 
@@ -55,9 +56,9 @@ describe('DefaultQueueProcessorProvider', () => {
         const prismaClient = PrismaDatabaseClientFactory.make();
         const doneCallback = jest.fn()
         const deal = DealFactory.make();
-        // @todo think
-        const userDeal = UserSellerFactory.make({deal_id: deal.id});
-        const webhook = WebhookFactory.make({user_id: userDeal.user_id});
+        const user = UserFactory.make();
+        const userSeller = UserSellerFactory.make({seller_id: deal.id, user_id: user.id});
+        const webhook = WebhookFactory.make({user_id: userSeller.user_id});
         const job = JobFactory.make({
             data: {
                 event_name: EventsEnum.DEAL_CREATED,
@@ -65,7 +66,7 @@ describe('DefaultQueueProcessorProvider', () => {
             }
         });
         (prismaClient.user_sellers.findMany as jest.Mock).mockResolvedValue([
-            userDeal
+            userSeller
         ]);
         (prismaClient.webhooks.findMany as jest.Mock).mockResolvedValue([
             webhook
