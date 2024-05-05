@@ -35,7 +35,7 @@ describe('CreateDealsValidator', () => {
                 user_id: faker.number.int({min: 1}),
                 user_types: {
                     id: faker.number.int({min: 1}),
-                    type: UserTypeEnum.SELLER.toUpperCase()
+                    type: UserTypeEnum.SELLER
                 },
             }]
         });

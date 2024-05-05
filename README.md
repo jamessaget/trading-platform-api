@@ -4,7 +4,24 @@ An api to create a user & authentication token which can be used to create and u
 
 ## Setup
 
-*insert setup instructions*
+1. Copy env
+```
+cp .env.example .env
+```
+2. Build docker container
+This will build x3 containers one for the node api, one for redis and one for mysql.
+```
+docker-compose up -d trading-platform-api
+```
+3. 
+    - Shell into the trading-platform-api contains
+    - Run prisma command to migrate (This will run migrations based on the prisma.schea file)
+    - Seed database with user_types (buyer & seller)
+```
+docker exec -it trading-platform-api sh
+npx prisma db push
+npx prisma db seed
+```
 
 ## Example requests
 ### Users

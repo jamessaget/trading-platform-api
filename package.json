@@ -5,6 +5,9 @@
   "directories": {
     "test": "tests"
   },
+  "prisma": {
+    "seed": "npx ts-node prisma/seed.ts"
+  },
   "scripts": {
     "start": "nodemon -e ts --exec 'npm run build && node ./dist/server.js'",
     "build": "tsc",

@@ -33,7 +33,7 @@ export class CreateUserHandler {
             ...(await this.prismaClient.user_types.findMany({
               where: {
                 type: {
-                  in: data.user_type.map(userType => userType.toUpperCase())
+                  in: data.user_type.map(userType => userType)
                 }
               }
             })).map(userType => ({

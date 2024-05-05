@@ -29,7 +29,7 @@ export class CreateDealsValidator {
     if (
       !user.users_type_relation
         .map(userTypeRelation => userTypeRelation.user_types.type)
-        .includes(UserTypeEnum.SELLER.toUpperCase())
+        .includes(UserTypeEnum.SELLER)
     ) {
       reply.code(401);
       throw new Error('Only sellers allowed');
