@@ -1,6 +1,7 @@
 import {generalConfig} from '../../config/general';
 import Queue from 'bull';
 import {QueueProcessorDescriptorType} from './queue-processor-descriptor-type';
+import {Queue as QueueType} from 'bull';
 
 export class QueueManager {
   private static instance: QueueManager | null = null;
@@ -8,14 +9,14 @@ export class QueueManager {
 
   private constructor() {}
   
-  public static get() {
+  public static get(): QueueManager {
     if (!QueueManager.instance) {
       QueueManager.instance = new QueueManager();
     }
     return QueueManager.instance;
   }
 
-  public resolve(queueDescriptor: QueueProcessorDescriptorType) {
+  public resolve(queueDescriptor: QueueProcessorDescriptorType): QueueType {
     if (!(queueDescriptor.queue in this.queues)) {
       console.log(`Queue ${queueDescriptor.queue} connector being created`);
       this.queues[queueDescriptor.queue] = new Queue(

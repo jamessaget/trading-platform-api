@@ -1,7 +1,8 @@
 import {ZodError} from 'zod';
 import {ApplicationClientError} from './application-client-error';
+import {FastifyReply, FastifyRequest} from 'fastify';
 
-export const globalErrorHandler = (error, request, reply) => {
+export const globalErrorHandler = (error, request: FastifyRequest, reply: FastifyReply) => {
   console.log({error, request});
   if (error instanceof ZodError) {
     return reply.status(422).send({

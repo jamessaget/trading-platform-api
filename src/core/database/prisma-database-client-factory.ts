@@ -6,14 +6,14 @@ export class PrismaDatabaseClientFactory {
 
   private constructor() {}
   
-  public static get() {
+  public static get(): PrismaDatabaseClientFactory  {
     if (!PrismaDatabaseClientFactory.instance) {
       PrismaDatabaseClientFactory.instance = new PrismaDatabaseClientFactory();
     }
     return PrismaDatabaseClientFactory.instance;
   }
 
-  public resolve() {
+  public resolve(): PrismaClient {
     if (!this.client) {
       this.client = new PrismaClient();
     }
