@@ -1,9 +1,11 @@
-import { FastifyReply, FastifyRequest } from "fastify";
+import { FastifyRequest } from "fastify";
 import {CreateDealsValidator} from "../../../src/core/validation/create-deals-validator";
 import { PrismaDatabaseClientFactory } from "../../factories/prisma-database-client-factory";
 import { UserFactory } from "../../factories/user-factory";
 import { faker } from "@faker-js/faker";
 import { UserTypeEnum } from "../../../src/core/enums/user-type-enum";
+import { FastifyReplyFactory } from "../../factories/fastify-reply-factory";
+import { FastifyRequestFactory } from "../../factories/fastify-request-factory";
 
 describe('CreateDealsValidator', () => {
     it('Should throw error if user is not a seller', async () => {
@@ -11,17 +13,13 @@ describe('CreateDealsValidator', () => {
         const prismaClient = PrismaDatabaseClientFactory.make();
         const user = UserFactory.make();
         (prismaClient.users.findFirst as jest.Mock).mockResolvedValue(user);
-        const request = {
-            headers: {},
+        const request = FastifyRequestFactory.make({
             user_id: user.id
-        };
-        const reply = {
-            code: jest.fn().mockReturnThis(),
-            send: jest.fn()
-        }
+        });
+        const reply = FastifyReplyFactory.make();
         await expect(() => new CreateDealsValidator(prismaClient).validate(
-            request as unknown as FastifyRequest & {user_id: number},
-            reply as unknown as FastifyReply
+            request,
+            reply
         )).rejects.toThrow(error)
         expect(reply.code).toHaveBeenCalledWith(401)
     });
@@ -40,17 +38,14 @@ describe('CreateDealsValidator', () => {
             }]
         });
         (prismaClient.users.findFirst as jest.Mock).mockResolvedValue(user);
-        const request = {
-            headers: {},
+        const request = FastifyRequestFactory.make({
             user_id: user.id
-        };
-        const reply = {
-            code: jest.fn().mockReturnThis(),
-            send: jest.fn()
-        }
+        });
+        request.user_id
+        const reply = FastifyReplyFactory.make();
         await expect(() => new CreateDealsValidator(prismaClient).validate(
-            request as unknown as FastifyRequest & {user_id: number},
-            reply as unknown as FastifyReply
+            request,
+            reply
         )).not.toThrow()
     });
 });

@@ -15,6 +15,7 @@
     "/v1/deals": {
       "post": {
         "summary": "Creates a new deal",
+        "description": "Will create a new deal total_price will be calculated from deal_items sum",
         "requestBody": {
           "content": {
             "application/json": {
@@ -273,7 +274,6 @@
     "/v1/deals/{id}": {
       "patch": {
         "summary": "Updates a deal",
-        "description": "Update properties are limited to; name, currency, status",
         "parameters": [
           {
             "in": "path",
@@ -294,7 +294,7 @@
                     "type": "string",
                     "description": "Name of the deal"
                   },
-                  "currency":{
+                  "currency": {
                     "type": "string",
                     "description": "Currency of the deal"
                   },
@@ -302,6 +302,36 @@
                     "type": "string",
                     "enum": ["available", "sold"],
                     "description": "The status of the deal"
+                  },
+                  "discount": {
+                    "type": "object",
+                    "properties": {
+                      "type": {
+                        "type": "string",
+                        "enum": ["flat", "percentage"],
+                        "description": "The type of discount"
+                      },
+                      "amount": {
+                        "type": "integer",
+                        "description": "The amount of discount to be given"
+                      }
+                    }
+                  },
+                  "deal_items": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "name": {
+                          "type": "string",
+                          "description": "name of the deal item"
+                        },
+                        "price": {
+                          "type": "integer",
+                          "description": "Price of deal item"
+                        }
+                      }
+                    }
                   }
                 }
               }

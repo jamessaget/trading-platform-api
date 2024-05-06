@@ -3,6 +3,7 @@ import { PrismaClient } from '@prisma/client';
 export class PrismaDatabaseClientFactory {
     public static make(overrides: Partial<PrismaClient> = {}): PrismaClient {
         return {
+            $transaction: jest.fn(),
             user_sellers: {
                 findMany: jest.fn(),
             },

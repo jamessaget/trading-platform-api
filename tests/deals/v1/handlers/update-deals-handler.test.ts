@@ -1,10 +1,12 @@
-import { FastifyRequest, FastifyReply } from "fastify";
+import { FastifyRequest } from "fastify";
 import { ZodError } from "zod";
 import { DealUpdatedEvent } from "../../../../src/core/events/deal-updated-event";
 import { UpdateDealsHandler } from "../../../../src/deals/v1/handlers/update-deals-hander";
 import { DealFactory } from "../../../factories/deal-factory";
 import { PrismaDatabaseClientFactory } from "../../../factories/prisma-database-client-factory";
 import { UserFactory } from "../../../factories/user-factory";
+import { FastifyReplyFactory } from "../../../factories/fastify-reply-factory";
+import { FastifyRequestFactory } from "../../../factories/fastify-request-factory";
 
 jest.mock('../../../../src/core/events/deal-updated-event', () => ({
     DealUpdatedEvent: jest.fn(() => ({
@@ -18,31 +20,24 @@ describe('UpdateDealsHandler', () => {
         const deal = DealFactory.make({
             seller_id: user.id
         });
-        const request = {
-            headers: {},
+        const request = FastifyRequestFactory.make({user_id: user.id}, {
             params: {
                 id: deal.id
             },
-            user_id: user.id,
             body: {
                 name: deal.name,
                 currency: deal.currency,
                 status: deal.status,
-                total_price: deal.total_price,
             }
-        };
-        const reply = {
-            code: jest.fn().mockReturnThis(),
-            send: jest.fn()
-        }
+        });
+        const reply = FastifyReplyFactory.make();
         const prismaClient = PrismaDatabaseClientFactory.make();
-        (prismaClient.deals.update as jest.Mock).mockResolvedValue(deal);
+        (prismaClient.$transaction as jest.Mock).mockResolvedValue(deal);
         await new UpdateDealsHandler(prismaClient).handle(
             request as FastifyRequest<{ Params: {id: number} }> & {user_id: number},
-            reply as unknown as FastifyReply
+            reply
         );
         expect(DealUpdatedEvent.prototype.constructor).toHaveBeenCalledTimes(1)
-        expect(prismaClient.deals.update).toHaveBeenCalledTimes(1)
         expect(reply.code).toHaveBeenNthCalledWith(1, 200)
     });
 
@@ -51,21 +46,19 @@ describe('UpdateDealsHandler', () => {
         const deal = DealFactory.make({
             seller_id: user.id
         });
-        const request = {
-            headers: {},
+        const request = FastifyRequestFactory.make({user_id: user.id}, {
             params: {
                 id: deal.id
             },
-            user_id: user.id
-        };
-        const reply = {
-            code: jest.fn().mockReturnThis(),
-            send: jest.fn()
-        }
+            body: {
+                total_price: 1000000
+            }
+        });
+        const reply = FastifyReplyFactory.make();
         const prismaClient = PrismaDatabaseClientFactory.make();
         await expect(() => new UpdateDealsHandler(prismaClient).handle(
             request as FastifyRequest<{ Params: {id: number} }> & {user_id: number},
-            reply as unknown as FastifyReply
+            reply
         )).rejects.toThrow(ZodError);
     });
 });

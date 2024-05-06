@@ -1,4 +1,3 @@
-import { FastifyReply, FastifyRequest } from "fastify";
 import { CreateDealsHandler } from '../../../../src/deals/v1/handlers/create-deals-hander'
 import { PrismaDatabaseClientFactory } from "../../../factories/prisma-database-client-factory";
 import { UserFactory } from "../../../factories/user-factory";
@@ -7,6 +6,8 @@ import { faker } from "@faker-js/faker";
 import { DealFactory } from "../../../factories/deal-factory";
 import { DiscountFactory } from "../../../factories/discount-factory";
 import { DealCreatedEvent } from "../../../../src/core/events/deal-created-event";
+import { FastifyReplyFactory } from "../../../factories/fastify-reply-factory";
+import { FastifyRequestFactory } from "../../../factories/fastify-request-factory";
 
 jest.mock('../../../../src/core/events/deal-created-event', () => ({
     DealCreatedEvent: jest.fn(() => ({
@@ -21,9 +22,7 @@ describe('CreateDealsHandler', () => {
             seller_id: user.id
         });
         const discount = DiscountFactory.make();
-        const request = {
-            headers: {},
-            user_id: user.id,
+        const request = FastifyRequestFactory.make({user_id: user.id}, {
             body: {
                 name: deal.name,
                 currency: deal.currency,
@@ -37,17 +36,14 @@ describe('CreateDealsHandler', () => {
                   }
                 ]
             }
-        };
-        const reply = {
-            code: jest.fn().mockReturnThis(),
-            send: jest.fn()
-        }
+        });
+        const reply = FastifyReplyFactory.make();
         const prismaClient = PrismaDatabaseClientFactory.make();
         (prismaClient.discounts.upsert as jest.Mock).mockResolvedValue(discount);
         (prismaClient.deals.create as jest.Mock).mockResolvedValue(deal);
         await new CreateDealsHandler(prismaClient).handle(
-            request as FastifyRequest & {user_id: number},
-            reply as unknown as FastifyReply
+            request,
+            reply,
         );
         expect(DealCreatedEvent.prototype.constructor).toHaveBeenCalledTimes(1)
         expect(prismaClient.discounts.upsert).toHaveBeenCalledTimes(1)
@@ -57,18 +53,14 @@ describe('CreateDealsHandler', () => {
 
     it('Should throw zod error on failed validation', async () => {
         const user = UserFactory.make();
-        const request = {
-            headers: {},
+        const request = FastifyRequestFactory.make({
             user_id: user.id
-        };
-        const reply = {
-            code: jest.fn().mockReturnThis(),
-            send: jest.fn()
-        }
+        });
+        const reply = FastifyReplyFactory.make();
         const prismaClient = PrismaDatabaseClientFactory.make();
         await expect(() => new CreateDealsHandler(prismaClient).handle(
-            request as FastifyRequest & {user_id: number},
-            reply as unknown as FastifyReply
+            request,
+            reply
         )).rejects.toThrow(ZodError);
     });
 });

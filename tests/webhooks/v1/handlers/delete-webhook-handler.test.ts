@@ -1,8 +1,10 @@
-import { FastifyRequest, FastifyReply } from 'fastify';
+import { FastifyRequest } from 'fastify';
 import { DeleteWebhookHandler } from '../../../../src/webhooks/v1/handlers/delete-webhook-hander'
 import { PrismaDatabaseClientFactory } from '../../../factories/prisma-database-client-factory';
 import { UserFactory } from '../../../factories/user-factory';
 import { DealFactory } from '../../../factories/deal-factory';
+import { FastifyReplyFactory } from '../../../factories/fastify-reply-factory';
+import { FastifyRequestFactory } from '../../../factories/fastify-request-factory';
 
 describe('DeleteWebhookHandler', () => {
     afterEach(() => {
@@ -14,21 +16,16 @@ describe('DeleteWebhookHandler', () => {
         const deal = DealFactory.make({
             seller_id: user.id
         })
-        const request = {
-            headers: {},
+        const request = FastifyRequestFactory.make({user_id: user.id}, {
             params: {
                 id: deal.id
             },
-            user_id: user.id
-        };
-        const reply = {
-            code: jest.fn().mockReturnThis(),
-            send: jest.fn()
-        }
+        });
+        const reply = FastifyReplyFactory.make();
         const prismaClient = PrismaDatabaseClientFactory.make();
         await new DeleteWebhookHandler(prismaClient).handle(
             request as FastifyRequest<{ Params: {id: number} }> & {user_id: number},
-            reply as unknown as FastifyReply
+            reply
         );
         expect(reply.code).toHaveBeenNthCalledWith(1, 200)
     });
