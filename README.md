@@ -2,6 +2,9 @@
 
 An api to create a user & authentication token which can be used to create and update deals.  Users will only be able to see deals from associated sellers to them through the user_sellers table (this is a manual process). Anytime a new deal is created or an existing deal is updated all users who are authorized to see that sellers deals will get an update sent to any of their registered webhooks.
 
+Open api spec in json located in src/
+    - (can be previewed with OpenApi extension for vscode) or html can be generated using `npx swagger-convert-to-html ./src/api-spec.json ./api-swagger-spec.html` and can be opened in the browser
+
 ## Setup
 
 1. Copy env
