@@ -33,10 +33,6 @@
                     "enum": ["available", "sold"],
                     "description": "The status of the deal"
                   },
-                  "total_price": {
-                    "type": "integer",
-                    "description": "The total price of the deal"
-                  },
                   "discount": {
                     "type": "object",
                     "properties": {
@@ -277,7 +273,7 @@
     "/v1/deals/{id}": {
       "patch": {
         "summary": "Updates a deal",
-        "description": "Update properties are limited to; name, currency, status, total_price",
+        "description": "Update properties are limited to; name, currency, status",
         "parameters": [
           {
             "in": "path",
@@ -306,10 +302,6 @@
                     "type": "string",
                     "enum": ["available", "sold"],
                     "description": "The status of the deal"
-                  },
-                  "total_price": {
-                    "type": "integer",
-                    "description": "The total price of the deal"
                   }
                 }
               }

@@ -43,7 +43,7 @@ export class CreateDealsHandler {
         seller_id: request.user_id,
         currency: data.currency,
         status: data.status,
-        total_price: data.total_price,
+        total_price: data.deal_items.reduce((acc, curr) => acc + curr.price, 0),
         discount_id: discountId,
         deal_items: {
           create: data.deal_items.map(dealItem => ({
