@@ -28,6 +28,6 @@ export class PrismaDatabaseClientFactory {
                 upsert: jest.fn(),
             },
             ...overrides
-          } as unknown as PrismaClient;
+          } as PrismaClient;
     }
 }

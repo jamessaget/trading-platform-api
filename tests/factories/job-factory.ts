@@ -10,6 +10,6 @@ export class JobFactory {
             progress: jest.fn(),
             attemptsMade: 0,
             ...overrides
-          } as unknown as Job;
+          } as Job;
     }
 }
