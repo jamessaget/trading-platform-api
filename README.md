@@ -35,7 +35,7 @@ clear && curl -H 'Content-type: application/json' -X 'POST' 'http://0.0.0.0:3000
 ### OAuth
 - Create oauth token
 ```
-clear && curl -H 'Content-type: application/json' -X 'POST' 'http://0.0.0.0:3000/v1/oauth/token' -d -H 'Authorization: Bearer *insert-token*' '{"username": "myemai@email.com", "password": "plain_text_password", "grant_type": "password"}'
+clear && curl -H 'Content-type: application/json' -X 'POST' 'http://0.0.0.0:3000/v1/oauth/token' -d '{"username": "myemai@email.com", "password": "plain_text_password", "grant_type": "password"}'
 ```
 ### Deals
 - Create deal
